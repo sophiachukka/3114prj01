@@ -49,7 +49,31 @@ public class SkipList<K extends Comparable<? super K>, V> implements Iterable<KV
      *            key to be searched for
      */
     public ArrayList<KVPair<K, V>> search(K key) {
-        return null;
+        // ADAPTED FROM OPEN DSA CODE
+
+        SkipNode x = head; // Dummy header node
+        int level = head.level;
+        for (int i = level; i >= 0; i--) { // For each level...
+            while ((x.forward[i] != null) && (x.forward[i].element().getKey()
+                .compareTo(key) < 0)) { // go forward
+                x = x.forward[i]; // Go one last step
+            }
+        }
+        
+        //array list to b returned
+        ArrayList<KVPair<K, V>> temp = new ArrayList<KVPair<K, V>>();
+        //x is the next node
+        x = x.forward[0];
+        
+        // add every proceeding node to the array list until the end or no
+        // longer in range of the right name.
+        while((x != null) && (x.element().getKey().compareTo(key) == 0)){
+            temp.add(x.element());
+            x = x.forward[0];
+        }
+        
+        //return either an empty or complete list.
+        return temp;
     }
 
 
@@ -70,7 +94,30 @@ public class SkipList<K extends Comparable<? super K>, V> implements Iterable<KV
      */
     @SuppressWarnings("unchecked")
     public void insert(KVPair<K, V> it) {
-        
+        // ADAPTED FROM OPEN DSA CODE
+
+        int newLevel = randomLevel(); // New node's level
+        int level = head.level;
+        if (newLevel > level) { // If new node is deeper
+            adjustHead(newLevel); // adjust the header
+        }
+        // Track end of level
+        SkipNode[] update = (SkipNode[])Array.newInstance(SkipNode.class, level
+            + 1);
+        SkipNode x = head; // Start at header node
+        for (int i = level; i >= 0; i--) { // Find insert position
+            while ((x.forward[i] != null) && (x.forward[i].element().getKey()
+                .compareTo(it.getKey()) < 0)) {
+                x = x.forward[i];
+            }
+            update[i] = x; // Track end at level i
+        }
+        x = new SkipNode(it, newLevel);
+        for (int i = 0; i <= newLevel; i++) { // Splice into list
+            x.forward[i] = update[i].forward[i]; // Who x points to
+            update[i].forward[i] = x; // Who points to x
+        }
+        size++; // Increment dictionary size
     }
 
 
@@ -83,7 +130,14 @@ public class SkipList<K extends Comparable<? super K>, V> implements Iterable<KV
      */
     @SuppressWarnings("unchecked")
     public void adjustHead(int newLevel) {
+        // ADAPTED FROM OPEN DSA CODE
         
+        SkipNode temp = head;
+        int level = head.level;
+        head = new SkipNode(null, newLevel);
+        for (int i = 0; i <= level; i++) {
+            head.forward[i] = temp.forward[i];
+        }
     }
 
 
