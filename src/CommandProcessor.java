@@ -43,14 +43,17 @@ public class CommandProcessor {
     public void processor(String line) {
         // converts the string of the line into an
         // array of its space (" ") delimited elements
-        String[] arr = line.split("\\s{1,}");        
+        String[] arr = line.split("\\s{1,}");
         String command = arr[0]; // the command will be the first of these
                                  // elements
         // calls the insert function and passes the correct
         // parameters by converting the string integers into
         // their Integer equivalent, trimming the whitespace
         if (command.equals("insert")) {
-            //Calls insert
+            // Calls insert
+            data.insert(new KVPair<String, Rectangle>(arr[1], new Rectangle(
+                Integer.parseInt(arr[2]), Integer.parseInt(arr[3]), Integer
+                    .parseInt(arr[4]), Integer.parseInt(arr[5]))));
         }
         // calls the appropriate remove method based on the
         // number of white space delimited strings in the line
@@ -59,36 +62,40 @@ public class CommandProcessor {
             int numParam = arr.length - 1;
             if (numParam == 1) {
                 // Calls remove by name
-                
+                data.remove(arr[1]);
             }
             else if (numParam == 4) {
                 // Calls remove by coordinate, converting string
                 // integers into their Integer equivalent minus whitespace
-                
+                data.remove(Integer.parseInt(arr[2]), Integer.parseInt(arr[3]),
+                    Integer.parseInt(arr[4]), Integer.parseInt(arr[5]));
             }
-            
+
         }
         else if (command.equals("regionsearch")) {
             // calls the regionsearch method for a set of coordinates
             // the string integers in the line will be trimmed of whitespace
-
+            data.regionsearch(Integer.parseInt(arr[2]), Integer.parseInt(
+                arr[3]), Integer.parseInt(arr[4]), Integer.parseInt(arr[5]));
         }
         else if (command.equals("intersections")) {
             // calls the intersections method, no parameters to be passed
-            // (see the intersections JavaDoc in the Database class for more information)
-           
+            // (see the intersections JavaDoc in the Database class for more
+            // information)
+            data.intersections();
         }
         else if (command.equals("search")) {
-             // calls the search method for a name of object
-           
+            // calls the search method for a name of object
+            data.search(arr[1]);
         }
         else if (command.equals("dump")) {
             // calls the dump method for the database, takes no parameters
-            // (see the dump() JavaDoc in the Database class for more information)
-
+            // (see the dump() JavaDoc in the Database class for more
+            // information)
+            data.dump();
         }
         else {
-                // the first white space delimited string in the line is not
+            // the first white space delimited string in the line is not
             // one of the commands which can manipulate the database,
             // a message will be written to the console
             System.out.println("Unrecognized command.");
